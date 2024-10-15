@@ -12,6 +12,7 @@ const app = express(); // Cria uma aplicação Express
 app.use(express.json()); // Informa ao app Express que receberá JSON nas requests (req_body)
 connectDatabase();
 
+// GET ALL TASKS
 app.get("/tasks", async (req, res) => {
     try {
         const tasks = await TaskModel.find({});
@@ -21,6 +22,19 @@ app.get("/tasks", async (req, res) => {
     }
 });
 
+// GET TASKS BY ID
+
+app.get("/tasks/:id", async (req, res) => {
+    const taskId = req.params.id;
+
+    const task = await TaskModel.findById(taskId);
+    if (!task) {
+        res.status(404).send("Esta tarefa não foi encontrada!");
+    }
+    res.status(200).send(task);
+});
+
+// CREATE TASK
 app.post("/tasks", async (req, res) => {
     try {
         const newTask = new TaskModel(req.body);
@@ -31,13 +45,14 @@ app.post("/tasks", async (req, res) => {
     }
 });
 
+// DELETE TASK
 app.delete("/tasks/:id", async (req, res) => {
     try {
         const taskId = req.params.id;
         const taskToDelete = await TaskModel.findById(taskId);
 
         if (!taskToDelete) {
-            return res.status(500).send("Esta tarefa não foi encontrada");
+            return res.status(404).send("Esta tarefa não foi encontrada!");
         }
         const deletedTask = await TaskModel.findByIdAndDelete(taskId);
         res.status(200).send(deletedTask);
