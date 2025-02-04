@@ -61,4 +61,30 @@ app.delete("/tasks/:id", async (req, res) => {
     }
 });
 
+app.patch("/tasks/:id", async (req, res) => {
+    try {
+        
+        const taskId = req.params.id;
+        const taskData = res.body 
+
+        const taskToUpdate = await TaskModel.findById(taskId);
+        const allowedUpdates = ["isCompleted"];
+        const requestedUpdates = Object.keys(taskData)
+
+        for (update of requestedUpdates) {
+            if (allowedUpdates.includes(update)) {
+                taskToUpdate[update] = taskData[update]
+            } else {
+                res.status(500).send("Um ou mais campos inseridos não são editáveis!")
+            }
+        }
+        await taskToUpdate.save()
+        return res.status(200).send(taskToUpdate)
+
+    }
+    catch (error) {
+        return res.status(500).send(error.message);
+    }
+})
+
 app.listen(8000, () => console.log("Listening on port 8000")); // Iniciar aplicação Express na porta 8000
