@@ -1,16 +1,13 @@
 const express = require("express")
-const TaskModel = require("../models/task.model");
-
 const router = express.Router();
+
+const TaskModel = require("../models/task.model");
+const TaskController = require("../controllers/task.controller")
+
 
 // GET ALL TASKS
 router.get("/", async (req, res) => {
-    try {
-        const tasks = await TaskModel.find({});
-        res.status(200).send(tasks);
-    } catch (error) {
-        res.status(500).send(error.message);
-    }
+    return new TaskController(req, res).getTasks();
 });
 
 // GET TASKS BY ID
@@ -42,7 +39,7 @@ router.patch("/:id", async (req, res) => {
     try {
         
         const taskId = req.params.id;
-        const taskData = res.body 
+        const taskData = req.body 
         
         const taskToUpdate = await TaskModel.findById(taskId);
         const allowedUpdates = ["isCompleted"];
