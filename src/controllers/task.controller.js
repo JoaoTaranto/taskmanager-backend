@@ -6,6 +6,7 @@ const {
     ObjectIdCastError,
 } = require("../errors/mongoose.errors");
 const { default: mongoose } = require("mongoose");
+const { notAllowedFieldsToUpdate } = require("../errors/general.errors");
 
 class TaskController {
     constructor(req, res) {
@@ -63,14 +64,15 @@ class TaskController {
                 if (allowedUpdates.includes(update)) {
                     taskToUpdate[update] = taskData[update];
                 } else {
-                    this.res
-                        .status(500)
-                        .send("Um ou mais campos inseridos não são editáveis!");
+                    return notAllowedFieldsToUpdate(this.res);
                 }
             }
             await taskToUpdate.save();
             return this.res.status(200).send(taskToUpdate);
         } catch (error) {
+            if (error instanceof mongoose.Error.CastError) {
+                return ObjectIdCastError(this.res);
+            }
             return this.res.status(500).send(error.message);
         }
     }
