@@ -12,7 +12,10 @@ jobs:
       - uses: actions/checkout@v3
       - name: Install Dependencies
         run: npm install
+      - name: Run Tests
+        run: npm test
       - name: Deploy to Render
         run: curl -X POST "$RENDER_DEPLOY_HOOK"
-        env: "production"
+        env: 
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+          ENVIRONMENT: production
